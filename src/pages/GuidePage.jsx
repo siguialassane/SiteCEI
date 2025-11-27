@@ -69,37 +69,15 @@ const GuidePage = () => {
             </div>
 
             {/* Main Content Area */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem 1.5rem 1.5rem', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
                 <AnimatePresence mode="wait">
                     <StepContent
                         step={guideSteps[currentStep]}
                         onShowMore={() => setShowModal(true)}
+                        onNext={nextStep}
+                        isLastStep={currentStep === guideSteps.length - 1}
                     />
                 </AnimatePresence>
-            </div>
-
-            {/* Footer Navigation */}
-            <div style={{ padding: '1rem 1.5rem', background: 'white', borderTop: '1px solid #f0f0f0', flexShrink: 0 }}>
-                <button
-                    onClick={nextStep}
-                    style={{
-                        width: '100%',
-                        background: 'var(--color-orange)',
-                        color: 'white',
-                        padding: '1rem',
-                        borderRadius: '14px',
-                        fontSize: '1rem',
-                        fontWeight: 600,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.5rem',
-                        boxShadow: '0 8px 16px rgba(255, 130, 0, 0.2)'
-                    }}
-                >
-                    {currentStep === guideSteps.length - 1 ? 'Explications futures' : 'Suivant'}
-                    <ArrowRight size={18} />
-                </button>
             </div>
 
             {/* Modal */}

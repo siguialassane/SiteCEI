@@ -1,8 +1,8 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Info } from 'lucide-react';
+import { Info, ArrowRight } from 'lucide-react';
 
-const StepContent = ({ step, onShowMore }) => {
+const StepContent = ({ step, onShowMore, onNext, isLastStep }) => {
     const videoRef = useRef(null);
 
     return (
@@ -136,6 +136,30 @@ const StepContent = ({ step, onShowMore }) => {
                         Savoir plus
                     </button>
                 )}
+
+                {/* Bouton Suivant (Orange) */}
+                <button
+                    onClick={onNext}
+                    style={{
+                        width: '100%',
+                        background: 'var(--color-orange)',
+                        color: 'white',
+                        padding: '1rem',
+                        borderRadius: '12px',
+                        fontSize: '1rem',
+                        fontWeight: 600,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        marginTop: '0.75rem',
+                        boxShadow: '0 8px 16px rgba(255, 130, 0, 0.2)',
+                        cursor: 'pointer'
+                    }}
+                >
+                    {isLastStep ? 'Explications futures' : 'Suivant'}
+                    <ArrowRight size={18} />
+                </button>
             </div>
 
         </motion.div>
