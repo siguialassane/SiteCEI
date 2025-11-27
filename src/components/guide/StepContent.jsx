@@ -16,23 +16,23 @@ const StepContent = ({ step, onShowMore }) => {
         >
 
             {/* Title Section */}
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{ marginBottom: '1rem' }}>
                 <div style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '0.5rem',
                     background: 'rgba(0, 154, 68, 0.1)',
                     color: 'var(--color-green)',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '20px',
-                    marginBottom: '1rem',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '16px',
+                    marginBottom: '0.75rem',
                     fontWeight: 600,
-                    fontSize: '0.9rem'
+                    fontSize: '0.85rem'
                 }}>
                     {step.icon}
                     <span>Étape actuelle</span>
                 </div>
-                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, lineHeight: 1.2, color: 'var(--color-text-main)' }}>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 800, lineHeight: 1.2, color: 'var(--color-text-main)' }}>
                     {step.title}
                 </h2>
             </div>
@@ -40,13 +40,15 @@ const StepContent = ({ step, onShowMore }) => {
             {/* Media Section */}
             <div style={{
                 width: '100%',
-                aspectRatio: '16/9',
+                aspectRatio: '4/3',
+                maxHeight: '35vh',
                 background: '#000',
-                borderRadius: '20px',
+                borderRadius: '16px',
                 overflow: 'hidden',
-                marginBottom: '1.5rem',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                position: 'relative'
+                marginBottom: '1rem',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                position: 'relative',
+                flexShrink: 0
             }}>
                 {step.type === 'video' ? (
                     <video
@@ -83,26 +85,27 @@ const StepContent = ({ step, onShowMore }) => {
             </div>
 
             {/* Description Section */}
-            <div style={{ background: 'white', padding: '1.5rem', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.03)' }}>
-                <p style={{ fontSize: '1.1rem', color: 'var(--color-text-main)', marginBottom: '1rem', lineHeight: '1.6' }}>
+            <div style={{ background: 'white', padding: '1rem', borderRadius: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>
+                <p style={{ fontSize: '1rem', color: 'var(--color-text-main)', marginBottom: '0.75rem', lineHeight: '1.5' }}>
                     {step.description}
                 </p>
-                <ul style={{ listStyle: 'none', padding: 0, marginBottom: '1.5rem' }}>
+                <ul style={{ listStyle: 'none', padding: 0, marginBottom: '1rem' }}>
                     {step.details.map((detail, idx) => (
                         <li key={idx} style={{
                             display: 'flex',
                             alignItems: 'flex-start',
-                            gap: '0.8rem',
-                            marginBottom: '0.8rem',
+                            gap: '0.6rem',
+                            marginBottom: '0.5rem',
                             color: 'var(--color-text-muted)',
-                            fontSize: '0.95rem'
+                            fontSize: '0.9rem'
                         }}>
                             <div style={{
-                                width: '6px',
-                                height: '6px',
+                                width: '5px',
+                                height: '5px',
                                 background: 'var(--color-orange)',
                                 borderRadius: '50%',
-                                marginTop: '8px'
+                                marginTop: '7px',
+                                flexShrink: 0
                             }}></div>
                             {detail}
                         </li>
@@ -118,9 +121,9 @@ const StepContent = ({ step, onShowMore }) => {
                             background: '#E8F5E9',
                             color: 'var(--color-green)',
                             border: '1px solid var(--color-green)',
-                            padding: '1rem',
-                            borderRadius: '12px',
-                            fontSize: '1rem',
+                            padding: '0.8rem',
+                            borderRadius: '10px',
+                            fontSize: '0.95rem',
                             fontWeight: 700,
                             display: 'flex',
                             alignItems: 'center',
@@ -129,7 +132,7 @@ const StepContent = ({ step, onShowMore }) => {
                             cursor: 'pointer'
                         }}
                     >
-                        <Info size={20} />
+                        <Info size={18} />
                         Savoir plus
                     </button>
                 )}

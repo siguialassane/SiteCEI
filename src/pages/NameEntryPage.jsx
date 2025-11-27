@@ -16,9 +16,15 @@ const NameEntryPage = () => {
     };
 
     return (
-        <div className="page-transition" style={{ background: 'var(--color-bg-off-white)' }}>
+        <div className="page-transition" style={{ 
+            background: 'var(--color-bg-off-white)', 
+            height: '100dvh',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
             {/* Header */}
-            <div style={{ padding: '2rem 1.5rem' }}>
+            <div style={{ padding: '1.5rem 1.5rem 1rem', flexShrink: 0 }}>
                 <button
                     onClick={() => navigate(-1)}
                     style={{ background: 'transparent', padding: '0.5rem', marginLeft: '-0.5rem' }}
@@ -31,8 +37,10 @@ const NameEntryPage = () => {
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                padding: '0 2rem',
-                justifyContent: 'center'
+                padding: '0 2rem 2rem',
+                justifyContent: 'flex-start',
+                paddingTop: '10vh',
+                overflowY: 'auto'
             }}>
 
                 <motion.div
@@ -63,7 +71,7 @@ const NameEntryPage = () => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.2, duration: 0.5 }}
                 >
-                    <div style={{ position: 'relative', marginBottom: '3rem' }}>
+                    <div style={{ position: 'relative', marginBottom: '2rem' }}>
                         <User
                             size={24}
                             color="var(--color-orange)"
@@ -74,7 +82,6 @@ const NameEntryPage = () => {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Votre nom complet"
-                            autoFocus
                             style={{
                                 width: '100%',
                                 padding: '1rem 1rem 1rem 2.5rem',

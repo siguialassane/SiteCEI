@@ -44,22 +44,22 @@ const GuidePage = () => {
     };
 
     return (
-        <div className="page-transition" style={{ background: '#F8F9FA', height: '100vh', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+        <div className="page-transition" style={{ background: '#F8F9FA', height: '100dvh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
 
             {/* Header with Progress */}
-            <div style={{ padding: '1.5rem', background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', zIndex: 10 }}>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+            <div style={{ padding: '1rem 1.5rem', background: 'white', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', zIndex: 10, flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.75rem' }}>
                     <button onClick={prevStep} style={{ background: 'transparent', padding: '0.5rem', marginLeft: '-0.5rem' }}>
                         <ArrowLeft size={24} color="var(--color-text-main)" />
                     </button>
-                    <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: '1.1rem' }}>
+                    <span style={{ flex: 1, textAlign: 'center', fontWeight: 700, fontSize: '1rem' }}>
                         Étape {currentStep + 1} sur {guideSteps.length}
                     </span>
                     <div style={{ width: '24px' }}></div>
                 </div>
 
                 {/* Progress Bar */}
-                <div style={{ width: '100%', height: '6px', background: '#f0f0f0', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '5px', background: '#f0f0f0', borderRadius: '3px', overflow: 'hidden' }}>
                     <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${((currentStep + 1) / guideSteps.length) * 100}%` }}
@@ -69,7 +69,7 @@ const GuidePage = () => {
             </div>
 
             {/* Main Content Area */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '1rem 1.5rem', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
                 <AnimatePresence mode="wait">
                     <StepContent
                         step={guideSteps[currentStep]}
@@ -79,26 +79,26 @@ const GuidePage = () => {
             </div>
 
             {/* Footer Navigation */}
-            <div style={{ padding: '1.5rem', background: 'white', borderTop: '1px solid #f0f0f0' }}>
+            <div style={{ padding: '1rem 1.5rem', background: 'white', borderTop: '1px solid #f0f0f0', flexShrink: 0 }}>
                 <button
                     onClick={nextStep}
                     style={{
                         width: '100%',
                         background: 'var(--color-orange)',
                         color: 'white',
-                        padding: '1.2rem',
-                        borderRadius: '16px',
-                        fontSize: '1.1rem',
+                        padding: '1rem',
+                        borderRadius: '14px',
+                        fontSize: '1rem',
                         fontWeight: 600,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         gap: '0.5rem',
-                        boxShadow: '0 10px 20px rgba(255, 130, 0, 0.2)'
+                        boxShadow: '0 8px 16px rgba(255, 130, 0, 0.2)'
                     }}
                 >
                     {currentStep === guideSteps.length - 1 ? 'Explications futures' : 'Suivant'}
-                    <ArrowRight size={20} />
+                    <ArrowRight size={18} />
                 </button>
             </div>
 
