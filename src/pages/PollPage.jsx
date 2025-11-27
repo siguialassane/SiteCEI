@@ -1,0 +1,275 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Check, Briefcase, HeartPulse, GraduationCap, Truck, Shield, Home } from 'lucide-react';
+
+const PollPage = () => {
+    const navigate = useNavigate();
+    const [step, setStep] = useState(0); // 0: Intro, 1: Party, 2: Priority, 3: Results
+    const [answers, setAnswers] = useState({ party: '', priority: '' });
+
+    // Data for Parties
+    const parties = [
+        { id: 'rhdp', name: 'RHDP', img: '/RHDP.png', color: '#FF8200' },
+        { id: 'pdci', name: 'PDCI-RDA', img: '/PDCI.png', color: '#009A44' },
+        { id: 'fpi', name: 'FPI', img: '/FPI.png', color: '#0087DC' }, // Blue for FPI usually
+        { id: 'mgc', name: 'MGC', img: null, color: '#9C27B0' }, // Placeholder color
+        { id: 'indep', name: 'Indépendant', img: null, color: '#607D8B' }
+    ];
+
+    // Data for Priorities
+    const priorities = [
+        { id: 'job', label: 'Emploi Jeunes', icon: <Briefcase size={24} /> },
+        { id: 'health', label: 'Santé', icon: <HeartPulse size={24} /> },
+        { id: 'edu', label: 'Éducation', icon: <GraduationCap size={24} /> },
+        { id: 'infra', label: 'Routes', icon: <Truck size={24} /> },
+        { id: 'security', label: 'Sécurité', icon: <Shield size={24} /> },
+    ];
+
+    const handlePartySelect = (partyId) => {
+        setAnswers({ ...answers, party: partyId });
+        setTimeout(() => setStep(2), 300); // Auto advance
+    };
+
+    const handlePrioritySelect = (priorityId) => {
+        setAnswers({ ...answers, priority: priorityId });
+        setTimeout(() => setStep(3), 300); // Auto advance
+    };
+
+    // Mock Results Data
+    const results = [
+        { name: 'RHDP', percent: 45, color: '#FF8200' },
+        { name: 'PDCI', percent: 30, color: '#009A44' },
+        { name: 'FPI', percent: 15, color: '#0087DC' },
+        { name: 'Autres', percent: 10, color: '#999' },
+    ];
+
+    return (
+        <div className="page-transition" style={{ background: '#F8F9FA', padding: '1.5rem' }}>
+
+            {/* Header */}
+            <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center' }}>
+                <button
+                    onClick={() => step === 0 ? navigate('/home') : setStep(step - 1)}
+                    style={{ background: 'white', padding: '0.8rem', borderRadius: '50%', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}
+                >
+                    {step === 3 ? <Home size={20} /> : <ArrowLeft size={20} />}
+                </button>
+                <div style={{ flex: 1, textAlign: 'center', fontWeight: 600, color: 'var(--color-text-muted)' }}>
+                    {step === 1 && 'Étape 1/2'}
+                    {step === 2 && 'Étape 2/2'}
+                    {step === 3 && 'Résultats'}
+                </div>
+                <div style={{ width: '40px' }}></div> {/* Spacer for centering */}
+            </div>
+
+            <AnimatePresence mode="wait">
+
+                {/* STEP 0: INTRO */}
+                {step === 0 && (
+                    <motion.div
+                        key="intro"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        style={{ textAlign: 'center', marginTop: '2rem' }}
+                    >
+                        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🗳️</div>
+                        <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '1rem' }}>
+                            Votre avis compte
+                        </h1>
+                        <p style={{ color: 'var(--color-text-muted)', marginBottom: '3rem', lineHeight: '1.6' }}>
+                            Participez à notre grand sondage anonyme sur les législatives 2025. Cela ne prend que 30 secondes.
+                        </p>
+                        <button
+                            onClick={() => setStep(1)}
+                            style={{
+                                background: 'var(--color-orange)',
+                                color: 'white',
+                                width: '100%',
+                                padding: '1.2rem',
+                                borderRadius: '16px',
+                                fontSize: '1.1rem',
+                                fontWeight: 600,
+                                boxShadow: '0 10px 20px rgba(255, 130, 0, 0.3)'
+                            }}
+                        >
+                            Commencer le sondage
+                        </button>
+                    </motion.div>
+                )}
+
+                {/* STEP 1: PARTY VOTE */}
+                {step === 1 && (
+                    <motion.div
+                        key="step1"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                    >
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>
+                            Pour qui voteriez-vous aujourd'hui ?
+                        </h2>
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            {parties.map((party) => (
+                                <motion.button
+                                    key={party.id}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={() => handlePartySelect(party.id)}
+                                    style={{
+                                        background: 'white',
+                                        padding: '1rem',
+                                        borderRadius: '20px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '1.2rem',
+                                        border: answers.party === party.id ? `2px solid ${party.color}` : '1px solid #f0f0f0',
+                                        boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                                        width: '100%',
+                                        minHeight: '80px'
+                                    }}
+                                >
+                                    <div style={{
+                                        width: '70px',
+                                        height: '60px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0
+                                    }}>
+                                        {party.img ? (
+                                            <img
+                                                src={party.img}
+                                                alt={party.name}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'contain',
+                                                    filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+                                                }}
+                                            />
+                                        ) : (
+                                            <span style={{ fontWeight: 700, color: party.color, fontSize: '1.5rem' }}>{party.name[0]}</span>
+                                        )}
+                                    </div>
+                                    <span style={{ fontSize: '1.1rem', fontWeight: 700, textAlign: 'left', flex: 1 }}>{party.name}</span>
+                                    {answers.party === party.id && (
+                                        <div style={{ color: party.color }}>
+                                            <Check size={28} />
+                                        </div>
+                                    )}
+                                </motion.button>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* STEP 2: PRIORITY */}
+                {step === 2 && (
+                    <motion.div
+                        key="step2"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                    >
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>
+                            Quelle est la priorité pour votre localité ?
+                        </h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            {priorities.map((p) => (
+                                <motion.button
+                                    key={p.id}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => handlePrioritySelect(p.id)}
+                                    style={{
+                                        background: answers.priority === p.id ? 'var(--color-orange)' : 'white',
+                                        color: answers.priority === p.id ? 'white' : 'var(--color-text-main)',
+                                        padding: '1.5rem',
+                                        borderRadius: '20px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '0.8rem',
+                                        border: 'none',
+                                        boxShadow: '0 4px 10px rgba(0,0,0,0.03)',
+                                        transition: 'all 0.3s'
+                                    }}
+                                >
+                                    {p.icon}
+                                    <span style={{ fontWeight: 600 }}>{p.label}</span>
+                                </motion.button>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* STEP 3: RESULTS */}
+                {step === 3 && (
+                    <motion.div
+                        key="results"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                    >
+                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                            <div style={{
+                                width: '80px',
+                                height: '80px',
+                                background: '#E8F5E9',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 1rem auto',
+                                color: 'var(--color-green)'
+                            }}>
+                                <Check size={40} />
+                            </div>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Merci d'avoir voté !</h2>
+                            <p style={{ color: 'var(--color-text-muted)' }}>Voici les tendances actuelles</p>
+                        </div>
+
+                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                            <h3 style={{ fontWeight: 700, marginBottom: '1.5rem' }}>Intentions de vote</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                                {results.map((r, index) => (
+                                    <div key={index}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>
+                                            <span>{r.name}</span>
+                                            <span>{r.percent}%</span>
+                                        </div>
+                                        <div style={{ width: '100%', height: '10px', background: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${r.percent}%` }}
+                                                transition={{ duration: 1, delay: 0.2 }}
+                                                style={{ height: '100%', background: r.color, borderRadius: '10px' }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => navigate('/home')}
+                            style={{
+                                marginTop: '2rem',
+                                background: 'transparent',
+                                color: 'var(--color-text-muted)',
+                                width: '100%',
+                                padding: '1rem',
+                                fontWeight: 600
+                            }}
+                        >
+                            Retour à l'accueil
+                        </button>
+                    </motion.div>
+                )}
+
+            </AnimatePresence>
+        </div>
+    );
+};
+
+export default PollPage;
