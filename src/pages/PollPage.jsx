@@ -10,11 +10,11 @@ const PollPage = () => {
 
     // Data for Parties
     const parties = [
-        { id: 'rhdp', name: 'RHDP', img: '/RHDP.png', color: '#FF8200' },
-        { id: 'pdci', name: 'PDCI-RDA', img: '/PDCI.png', color: '#009A44' },
-        { id: 'fpi', name: 'FPI', img: '/FPI.png', color: '#0087DC' }, // Blue for FPI usually
-        { id: 'mgc', name: 'MGC', img: null, color: '#9C27B0' }, // Placeholder color
-        { id: 'indep', name: 'Indépendant', img: null, color: '#607D8B' }
+        { id: 'rhdp', name: 'Bakary Ouattara', img: '/RHDP.png', color: '#FF8200' },
+        { id: 'pdci', name: 'Tialy', img: '/PDCI.png', color: '#009A44' },
+        { id: 'indep_simon', name: 'Kouadio Kouakou Simon', img: null, color: '#607D8B', type: 'Indépendant' },
+        { id: 'indep_faustin', name: 'Atchelo Faustin', img: null, color: '#607D8B', type: 'Indépendant' },
+        { id: 'indep_parfait', name: 'Traore Hamed Parfait', img: null, color: '#607D8B', type: 'Indépendant' }
     ];
 
     // Data for Priorities
@@ -38,10 +38,11 @@ const PollPage = () => {
 
     // Mock Results Data
     const results = [
-        { name: 'RHDP', percent: 45, color: '#FF8200' },
-        { name: 'PDCI', percent: 30, color: '#009A44' },
-        { name: 'FPI', percent: 15, color: '#0087DC' },
-        { name: 'Autres', percent: 10, color: '#999' },
+        { name: 'Bakary Ouattara', percent: 35, color: '#FF8200' },
+        { name: 'Tialy', percent: 30, color: '#009A44' },
+        { name: 'Kouadio K. Simon', percent: 15, color: '#607D8B' },
+        { name: 'Atchelo Faustin', percent: 10, color: '#78909C' },
+        { name: 'Traore H. Parfait', percent: 10, color: '#546E7A' },
     ];
 
     return (
@@ -152,7 +153,14 @@ const PollPage = () => {
                                             <span style={{ fontWeight: 700, color: party.color, fontSize: '1.5rem' }}>{party.name[0]}</span>
                                         )}
                                     </div>
-                                    <span style={{ fontSize: '1.1rem', fontWeight: 700, textAlign: 'left', flex: 1 }}>{party.name}</span>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', flex: 1 }}>
+                                        <span style={{ fontSize: '1.1rem', fontWeight: 700, textAlign: 'left' }}>{party.name}</span>
+                                        {party.type && (
+                                            <span style={{ fontSize: '0.85rem', color: '#78909C', fontWeight: 500, marginTop: '0.2rem' }}>
+                                                {party.type}
+                                            </span>
+                                        )}
+                                    </div>
                                     {answers.party === party.id && (
                                         <div style={{ color: party.color }}>
                                             <Check size={28} />
