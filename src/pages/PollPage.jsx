@@ -6,7 +6,7 @@ import { ArrowLeft, Check, Briefcase, HeartPulse, GraduationCap, Truck, Shield, 
 const PollPage = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState(0); // 0: Intro, 1: Party, 2: Priority, 3: Results
-    const [answers, setAnswers] = useState({ party: '', priority: '' });
+    const [answers, setAnswers] = useState({ party: '', priorities: [] });
 
     // Data for Parties
     const parties = [
@@ -32,8 +32,21 @@ const PollPage = () => {
     };
 
     const handlePrioritySelect = (priorityId) => {
-        setAnswers({ ...answers, priority: priorityId });
-        setTimeout(() => setStep(3), 300); // Auto advance
+        setAnswers(prev => {
+            const newPriorities = [...prev.priorities];
+            const index = newPriorities.indexOf(priorityId);
+
+            if (index > -1) {
+                // Deselect
+                newPriorities.splice(index, 1);
+            } else {
+                // Select if not full
+                if (newPriorities.length < 3) {
+                    newPriorities.push(priorityId);
+                }
+            }
+            return { ...prev, priorities: newPriorities };
+        });
     };
 
     // Mock Results Data
@@ -44,15 +57,23 @@ const PollPage = () => {
         { name: 'Atchelo Faustin', percent: 10, color: '#78909C' },
         { name: 'Traore H. Parfait', percent: 10, color: '#546E7A' },
     ];
+    
+    const priorityResults = [
+        { name: 'Emploi Jeunes', percent: 45, color: '#3498DB' },
+        { name: 'Santé', percent: 25, color: '#E74C3C' },
+        { name: 'Éducation', percent: 15, color: '#9B59B6' },
+        { name: 'Routes', percent: 10, color: '#F1C40F' },
+        { name: 'Sécurité', percent: 5, color: '#2ECC71' },
+    ];
 
     return (
-        <div className="page-transition" style={{ background: '#F8F9FA', padding: '1.5rem' }}>
+        <div className="page-transition" style={{ background: '#F8F9FA', padding: '1.5rem', minHeight: '100vh' }}>
 
             {/* Header */}
             <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center' }}>
                 <button
                     onClick={() => step === 0 ? navigate('/home') : setStep(step - 1)}
-                    style={{ background: 'white', padding: '0.8rem', borderRadius: '50%', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}
+                    style={{ background: 'white', padding: '0.8rem', borderRadius: '50%', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', zIndex: 10 }}
                 >
                     {step === 3 ? <Home size={20} /> : <ArrowLeft size={20} />}
                 </button>
@@ -72,7 +93,7 @@ const PollPage = () => {
                         key="intro"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
+                        exit={{ opacity: 0, y: -20 }}
                         style={{ textAlign: 'center', marginTop: '2rem' }}
                     >
                         <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🗳️</div>
@@ -179,38 +200,61 @@ const PollPage = () => {
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
+                        style={{ display: 'flex', flexDirection: 'column', height: 'calc(100% - 4rem)' }}
                     >
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.5rem' }}>
                             Quelle est la priorité pour votre localité ?
                         </h2>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                            {priorities.map((p) => (
-                                <motion.button
-                                    key={p.id}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => handlePrioritySelect(p.id)}
-                                    style={{
-                                        background: answers.priority === p.id ? 'var(--color-orange)' : 'white',
-                                        color: answers.priority === p.id ? 'white' : 'var(--color-text-main)',
-                                        padding: '1.5rem',
-                                        borderRadius: '20px',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: '0.8rem',
-                                        border: 'none',
-                                        boxShadow: '0 4px 10px rgba(0,0,0,0.03)',
-                                        transition: 'all 0.3s'
-                                    }}
-                                >
-                                    {p.icon}
-                                    <span style={{ fontWeight: 600 }}>{p.label}</span>
-                                </motion.button>
-                            ))}
+                        <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>Sélectionnez jusqu'à 3 options.</p>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                {priorities.map((p) => (
+                                    <motion.button
+                                        key={p.id}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => handlePrioritySelect(p.id)}
+                                        style={{
+                                            background: answers.priorities.includes(p.id) ? 'var(--color-orange)' : 'white',
+                                            color: answers.priorities.includes(p.id) ? 'white' : 'var(--color-text-main)',
+                                            padding: '1.5rem',
+                                            borderRadius: '20px',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: '0.8rem',
+                                            border: 'none',
+                                            boxShadow: '0 4px 10px rgba(0,0,0,0.03)',
+                                            transition: 'all 0.3s'
+                                        }}
+                                    >
+                                        {p.icon}
+                                        <span style={{ fontWeight: 600, textAlign: 'center' }}>{p.label}</span>
+                                    </motion.button>
+                                ))}
+                            </div>
                         </div>
+                         <motion.button
+                            onClick={() => setStep(3)}
+                            disabled={answers.priorities.length === 0}
+                            style={{
+                                background: 'var(--color-green)',
+                                color: 'white',
+                                width: '100%',
+                                padding: '1.2rem',
+                                borderRadius: '16px',
+                                fontSize: '1.1rem',
+                                fontWeight: 600,
+                                boxShadow: '0 10px 20px rgba(46, 204, 113, 0.3)',
+                                marginTop: '2rem',
+                                opacity: answers.priorities.length === 0 ? 0.5 : 1
+                            }}
+                        >
+                            Terminer
+                        </motion.button>
                     </motion.div>
                 )}
+
 
                 {/* STEP 3: RESULTS */}
                 {step === 3 && (
@@ -233,11 +277,12 @@ const PollPage = () => {
                             }}>
                                 <Check size={40} />
                             </div>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Merci d'avoir voté !</h2>
+                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Merci d'avoir participé !</h2>
                             <p style={{ color: 'var(--color-text-muted)' }}>Voici les tendances actuelles</p>
                         </div>
 
-                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                        {/* Vote Results */}
+                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '2rem' }}>
                             <h3 style={{ fontWeight: 700, marginBottom: '1.5rem' }}>Intentions de vote</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                                 {results.map((r, index) => (
@@ -258,6 +303,30 @@ const PollPage = () => {
                                 ))}
                             </div>
                         </div>
+
+                        {/* Priority Results */}
+                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                            <h3 style={{ fontWeight: 700, marginBottom: '1.5rem' }}>Priorités de la localité</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                                {priorityResults.map((r, index) => (
+                                    <div key={index}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>
+                                            <span>{r.name}</span>
+                                            <span>{r.percent}%</span>
+                                        </div>
+                                        <div style={{ width: '100%', height: '10px', background: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${r.percent}%` }}
+                                                transition={{ duration: 1, delay: 0.5 }}
+                                                style={{ height: '100%', background: r.color, borderRadius: '10px' }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
 
                         <button
                             onClick={() => navigate('/home')}

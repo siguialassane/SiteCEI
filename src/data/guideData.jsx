@@ -9,8 +9,8 @@ export const guideSteps = [
             "Consultez le site de la CEI",
             "Ou composez le *919# sur votre mobile"
         ],
-        type: "video",
-        media: "/1er_video.mp4",
+        type: "image",
+        media: "/Inscription.png",
         icon: <CheckCircle size={24} />,
         moreInfo: {
             title: "Tout savoir sur l'inscription",
@@ -82,7 +82,7 @@ export const guideSteps = [
             "2. Carte Nationale d'Identité (CNI)"
         ],
         type: "image",
-        media: "/3eme_ecran.png",
+        media: "/carte_electeur.png",
         icon: <FileText size={24} />,
         moreInfo: {
             title: "Tout savoir sur les documents requis",
@@ -123,7 +123,7 @@ export const guideSteps = [
             "Préparez vos documents à l'entrée"
         ],
         type: "image",
-        media: "/4eme_ecran.png",
+        media: "/buro_vote.png",
         icon: <Clock size={24} />,
         moreInfo: {
             title: "Conseils pour le jour du vote",
