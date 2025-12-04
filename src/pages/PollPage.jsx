@@ -1,12 +1,36 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check, Briefcase, HeartPulse, GraduationCap, Truck, Shield, Home } from 'lucide-react';
+import {
+    ArrowLeft, Check, Briefcase, HeartPulse, GraduationCap, Truck, Shield, Home,
+    User, Calendar, HelpCircle, Tv, Smartphone, FileText, Star
+} from 'lucide-react';
 
 const PollPage = () => {
     const navigate = useNavigate();
-    const [step, setStep] = useState(0); // 0: Intro, 1: Party, 2: Priority, 3: Results
-    const [answers, setAnswers] = useState({ party: '', priorities: [] });
+    const [step, setStep] = useState(0);
+    // Steps:
+    // 0: Intro
+    // 1: Candidate (Party)
+    // 2: Reason
+    // 3: Incumbent Rating
+    // 4: Priorities
+    // 5: Info Source
+    // 6: Voter Status
+    // 7: Age
+    // 8: Profession
+    // 9: Results
+
+    const [answers, setAnswers] = useState({
+        party: '',
+        priorities: [],
+        choiceReason: '',
+        incumbentRating: '',
+        infoSource: '',
+        voterStatus: '',
+        age: '',
+        profession: ''
+    });
 
     // Data for Parties
     const parties = [
@@ -26,9 +50,60 @@ const PollPage = () => {
         { id: 'security', label: 'Sécurité', icon: <Shield size={24} /> },
     ];
 
+    // New Question Options
+    const choiceReasons = [
+        'Le programme du candidat',
+        'Le parti politique',
+        'La personnalité du candidat',
+        'Le bilan du député sortant',
+        'Les actions sociales (dons, aides)'
+    ];
+
+    const incumbentRatings = [
+        'Très satisfaisant',
+        'Moyen',
+        'Décevant',
+        'Je ne le connais pas'
+    ];
+
+    const infoSources = [
+        'Facebook & Réseaux Sociaux',
+        'Télévision (RTI, NCI...)',
+        'Radio',
+        'Bouche à oreille (Grin, quartier)',
+        'Meetings et rassemblements'
+    ];
+
+    const voterStatuses = [
+        'Oui',
+        'Non',
+        'Je ne sais pas encore'
+    ];
+
+    const ageRanges = [
+        '18-25 ans',
+        '26-35 ans',
+        '36-50 ans',
+        '50 ans et plus'
+    ];
+
+    const professions = [
+        'Étudiant',
+        'Secteur Privé',
+        'Fonctionnaire',
+        'Commerçant(e) ou Entrepreneur',
+        'Sans emploi',
+        'Retraité'
+    ];
+
     const handlePartySelect = (partyId) => {
         setAnswers({ ...answers, party: partyId });
-        setTimeout(() => setStep(2), 300); // Auto advance
+        setTimeout(() => setStep(2), 300);
+    };
+
+    const handleSingleSelect = (field, value) => {
+        setAnswers({ ...answers, [field]: value });
+        setTimeout(() => setStep(step + 1), 300);
     };
 
     const handlePrioritySelect = (priorityId) => {
@@ -37,10 +112,8 @@ const PollPage = () => {
             const index = newPriorities.indexOf(priorityId);
 
             if (index > -1) {
-                // Deselect
                 newPriorities.splice(index, 1);
             } else {
-                // Select if not full
                 if (newPriorities.length < 3) {
                     newPriorities.push(priorityId);
                 }
@@ -57,7 +130,7 @@ const PollPage = () => {
         { name: 'Atchelo Faustin', percent: 10, color: '#78909C' },
         { name: 'Traore H. Parfait', percent: 10, color: '#546E7A' },
     ];
-    
+
     const priorityResults = [
         { name: 'Emploi Jeunes', percent: 45, color: '#3498DB' },
         { name: 'Santé', percent: 25, color: '#E74C3C' },
@@ -65,6 +138,48 @@ const PollPage = () => {
         { name: 'Routes', percent: 10, color: '#F1C40F' },
         { name: 'Sécurité', percent: 5, color: '#2ECC71' },
     ];
+
+    const totalSteps = 8; // Excluding intro and results
+
+    const renderSingleChoiceStep = (title, options, field) => (
+        <motion.div
+            key={`step-${field}`}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+        >
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>
+                {title}
+            </h2>
+            <div style={{ display: 'grid', gap: '1rem' }}>
+                {options.map((option) => (
+                    <motion.button
+                        key={option}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleSingleSelect(field, option)}
+                        style={{
+                            background: 'white',
+                            padding: '1.2rem',
+                            borderRadius: '16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            border: answers[field] === option ? '2px solid var(--color-orange)' : '1px solid #f0f0f0',
+                            boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+                            width: '100%',
+                            textAlign: 'left',
+                            fontSize: '1.05rem',
+                            fontWeight: 500,
+                            color: answers[field] === option ? 'var(--color-orange)' : 'var(--color-text-main)'
+                        }}
+                    >
+                        {option}
+                        {answers[field] === option && <Check size={20} />}
+                    </motion.button>
+                ))}
+            </div>
+        </motion.div>
+    );
 
     return (
         <div className="page-transition" style={{ background: '#F8F9FA', padding: '1.5rem', minHeight: '100vh' }}>
@@ -75,14 +190,13 @@ const PollPage = () => {
                     onClick={() => step === 0 ? navigate('/home') : setStep(step - 1)}
                     style={{ background: 'white', padding: '0.8rem', borderRadius: '50%', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', zIndex: 10 }}
                 >
-                    {step === 3 ? <Home size={20} /> : <ArrowLeft size={20} />}
+                    {step === 9 ? <Home size={20} /> : <ArrowLeft size={20} />}
                 </button>
                 <div style={{ flex: 1, textAlign: 'center', fontWeight: 600, color: 'var(--color-text-muted)' }}>
-                    {step === 1 && 'Étape 1/2'}
-                    {step === 2 && 'Étape 2/2'}
-                    {step === 3 && 'Résultats'}
+                    {step > 0 && step < 9 && `Question ${step}/${totalSteps}`}
+                    {step === 9 && 'Résultats'}
                 </div>
-                <div style={{ width: '40px' }}></div> {/* Spacer for centering */}
+                <div style={{ width: '40px' }}></div>
             </div>
 
             <AnimatePresence mode="wait">
@@ -101,7 +215,7 @@ const PollPage = () => {
                             Votre avis compte
                         </h1>
                         <p style={{ color: 'var(--color-text-muted)', marginBottom: '3rem', lineHeight: '1.6' }}>
-                            Participez à notre grand sondage anonyme sur les législatives 2025. Cela ne prend que 30 secondes.
+                            Participez à notre grand sondage anonyme sur les législatives 2025. Cela ne prend que quelques instants.
                         </p>
                         <button
                             onClick={() => setStep(1)}
@@ -193,10 +307,16 @@ const PollPage = () => {
                     </motion.div>
                 )}
 
-                {/* STEP 2: PRIORITY */}
-                {step === 2 && (
+                {/* STEP 2: REASON */}
+                {step === 2 && renderSingleChoiceStep("Qu'est-ce qui détermine le plus votre choix ?", choiceReasons, 'choiceReason')}
+
+                {/* STEP 3: INCUMBENT RATING */}
+                {step === 3 && renderSingleChoiceStep("Comment jugez-vous le travail du député sortant ?", incumbentRatings, 'incumbentRating')}
+
+                {/* STEP 4: PRIORITIES */}
+                {step === 4 && (
                     <motion.div
-                        key="step2"
+                        key="step4"
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -20 }}
@@ -234,8 +354,8 @@ const PollPage = () => {
                                 ))}
                             </div>
                         </div>
-                         <motion.button
-                            onClick={() => setStep(3)}
+                        <motion.button
+                            onClick={() => setStep(5)}
                             disabled={answers.priorities.length === 0}
                             style={{
                                 background: 'var(--color-green)',
@@ -250,14 +370,26 @@ const PollPage = () => {
                                 opacity: answers.priorities.length === 0 ? 0.5 : 1
                             }}
                         >
-                            Terminer
+                            Suivant
                         </motion.button>
                     </motion.div>
                 )}
 
+                {/* STEP 5: INFO SOURCE */}
+                {step === 5 && renderSingleChoiceStep("Comment vous informez-vous sur la politique ?", infoSources, 'infoSource')}
 
-                {/* STEP 3: RESULTS */}
-                {step === 3 && (
+                {/* STEP 6: VOTER STATUS */}
+                {step === 6 && renderSingleChoiceStep("Avez-vous votre carte d'électeur ?", voterStatuses, 'voterStatus')}
+
+                {/* STEP 7: AGE */}
+                {step === 7 && renderSingleChoiceStep("Quelle est votre tranche d'âge ?", ageRanges, 'age')}
+
+                {/* STEP 8: PROFESSION */}
+                {step === 8 && renderSingleChoiceStep("Quelle est votre situation professionnelle ?", professions, 'profession')}
+
+
+                {/* STEP 9: RESULTS */}
+                {step === 9 && (
                     <motion.div
                         key="results"
                         initial={{ opacity: 0, scale: 0.9 }}
