@@ -58,8 +58,7 @@ const AdminLayout = () => {
                 flexDirection: 'column',
                 position: 'fixed',
                 height: '100vh',
-                zIndex: 50,
-                '@media (min-width: 768px)': { display: 'flex' }
+                zIndex: 50
             }} className="sidebar-desktop">
                 <SidebarContent
                     menuItems={menuItems}

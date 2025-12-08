@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Mail, Eye, EyeOff, Shield } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, Shield, Home } from 'lucide-react';
 import { supabase } from '../../supabaseClient';
 
 const AdminLoginPage = () => {
@@ -275,9 +275,32 @@ const AdminLoginPage = () => {
                     paddingTop: '1.5rem',
                     borderTop: '1px solid #e5e7eb'
                 }}>
-                    <p style={{ color: '#9ca3af', fontSize: '0.85rem' }}>
+                    <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginBottom: '1rem' }}>
                         🔒 Accès réservé aux administrateurs
                     </p>
+                    <button
+                        onClick={() => navigate('/home')}
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            padding: '0.75rem 1.5rem',
+                            background: '#f1f5f9',
+                            border: 'none',
+                            borderRadius: '12px',
+                            cursor: 'pointer',
+                            color: '#475569',
+                            fontSize: '0.9rem',
+                            fontWeight: 500,
+                            fontFamily: 'Outfit, sans-serif',
+                            transition: 'all 0.3s'
+                        }}
+                        onMouseOver={(e) => e.target.style.background = '#e2e8f0'}
+                        onMouseOut={(e) => e.target.style.background = '#f1f5f9'}
+                    >
+                        <Home size={18} />
+                        Retour à l'accueil
+                    </button>
                 </div>
             </motion.div>
         </div>
