@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { User, ArrowRight, ChevronLeft, Phone, Calendar } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 const NameEntryPage = () => {
     const navigate = useNavigate();
@@ -11,26 +12,61 @@ const NameEntryPage = () => {
         birthDate: '',
         phone: ''
     });
+    const [phoneError, setPhoneError] = useState('');
+    const [isChecking, setIsChecking] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (formData.lastName.trim() && formData.firstName.trim()) {
-            localStorage.setItem('userLastName', formData.lastName.trim());
-            localStorage.setItem('userFirstName', formData.firstName.trim());
-            localStorage.setItem('userName', `${formData.firstName.trim()} ${formData.lastName.trim()}`);
-            if(formData.birthDate) localStorage.setItem('userBirthDate', formData.birthDate);
-            if(formData.phone) localStorage.setItem('userPhone', formData.phone.trim());
-            
-            navigate('/address');
+        if (name === 'phone') {
+            setPhoneError('');
         }
     };
 
-    const isFormValid = formData.lastName.trim() && formData.firstName.trim();
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!isFormValid) return;
+
+        setIsChecking(true);
+        const { data, error } = await supabase
+            .from('participants')
+            .select('*')
+            .eq('phone', formData.phone.trim())
+            .single();
+        setIsChecking(false);
+
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error checking phone number:', error);
+            setPhoneError('Erreur lors de la vérification du numéro.');
+            return;
+        }
+
+        if (data) {
+            // Utilisateur existant - récupérer toutes ses infos
+            localStorage.setItem('hasVoted', 'true');
+            localStorage.setItem('userPhone', formData.phone.trim());
+            localStorage.setItem('userName', `${data.first_name} ${data.last_name}`);
+            localStorage.setItem('userFirstName', data.first_name);
+            localStorage.setItem('userLastName', data.last_name);
+            if (data.gender) localStorage.setItem('userGender', data.gender);
+            if (data.birth_date) localStorage.setItem('userBirthDate', data.birth_date);
+            if (data.location) localStorage.setItem('userLocation', data.location);
+            if (data.location_detail) localStorage.setItem('userLocationDetail', data.location_detail);
+            navigate('/already-voted');
+            return;
+        }
+
+        // Nouvel utilisateur
+        localStorage.setItem('userLastName', formData.lastName.trim());
+        localStorage.setItem('userFirstName', formData.firstName.trim());
+        localStorage.setItem('userName', `${formData.firstName.trim()} ${formData.lastName.trim()}`);
+        if(formData.birthDate) localStorage.setItem('userBirthDate', formData.birthDate);
+        localStorage.setItem('userPhone', formData.phone.trim());
+        
+        navigate('/gender');
+    };
+
+    const isFormValid = formData.lastName.trim() && formData.firstName.trim() && formData.phone.trim();
 
     return (
         <div className="page-transition" style={{ 
@@ -92,13 +128,13 @@ const NameEntryPage = () => {
                         {/* Prénom */}
                         <div style={{ position: 'relative' }}>
                             <User size={20} color="var(--color-orange)" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '0' }} />
-                            <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Prénom" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} />
+                            <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Prénom" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} required />
                         </div>
 
                         {/* Nom */}
                         <div style={{ position: 'relative' }}>
                             <User size={20} color="var(--color-orange)" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '0' }} />
-                            <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Nom" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} />
+                            <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Nom" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} required />
                         </div>
 
                         {/* Date de Naissance */}
@@ -110,18 +146,19 @@ const NameEntryPage = () => {
                         {/* Numéro de téléphone */}
                         <div style={{ position: 'relative' }}>
                             <Phone size={20} color="var(--color-orange)" style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', left: '0' }} />
-                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Numéro de téléphone" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} />
+                            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Numéro de téléphone (obligatoire)" style={inputStyle} onFocus={handleFocus} onBlur={handleBlur} required />
+                            {phoneError && <p style={{ color: 'red', fontSize: '0.8rem', marginTop: '0.5rem' }}>{phoneError}</p>}
                         </div>
                     </div>
 
                     <motion.button
                         type="submit"
-                        disabled={!isFormValid}
-                        whileHover={{ scale: isFormValid ? 1.02 : 1 }}
-                        whileTap={{ scale: isFormValid ? 0.98 : 1 }}
+                        disabled={!isFormValid || isChecking}
+                        whileHover={{ scale: isFormValid && !isChecking ? 1.02 : 1 }}
+                        whileTap={{ scale: isFormValid && !isChecking ? 0.98 : 1 }}
                         style={{
                             width: '100%',
-                            background: isFormValid ? 'var(--color-orange)' : '#ccc',
+                            background: isFormValid && !isChecking ? 'var(--color-orange)' : '#ccc',
                             color: 'white',
                             padding: '1.2rem',
                             borderRadius: '16px',
@@ -131,13 +168,13 @@ const NameEntryPage = () => {
                             alignItems: 'center',
                             justifyContent: 'center',
                             gap: '0.5rem',
-                            cursor: isFormValid ? 'pointer' : 'not-allowed',
+                            cursor: isFormValid && !isChecking ? 'pointer' : 'not-allowed',
                             transition: 'background-color 0.3s',
-                            boxShadow: isFormValid ? '0 10px 20px rgba(255, 130, 0, 0.2)' : 'none',
+                            boxShadow: isFormValid && !isChecking ? '0 10px 20px rgba(255, 130, 0, 0.2)' : 'none',
                             marginTop: '3rem'
                         }}
                     >
-                        Continuer <ArrowRight size={20} />
+                        {isChecking ? 'Vérification...' : 'Continuer'} <ArrowRight size={20} />
                     </motion.button>
                 </motion.form>
 

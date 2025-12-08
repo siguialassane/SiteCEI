@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Check, Briefcase, HeartPulse, GraduationCap, Truck, Shield, Home,
     User, Calendar, HelpCircle, Tv, Smartphone, FileText, Star
 } from 'lucide-react';
+import { supabase } from '../supabaseClient';
 
 const PollPage = () => {
     const navigate = useNavigate();
@@ -96,6 +97,63 @@ const PollPage = () => {
         'Retraité'
     ];
 
+    const submitPoll = async () => {
+        const participantData = {
+            first_name: localStorage.getItem('userFirstName'),
+            last_name: localStorage.getItem('userLastName'),
+            birth_date: localStorage.getItem('userBirthDate'),
+            phone: localStorage.getItem('userPhone'),
+            location: localStorage.getItem('userLocation'),
+            location_detail: localStorage.getItem('userLocationDetail'),
+            gender: localStorage.getItem('userGender'),
+        };
+
+        const { data: participant, error: participantError } = await supabase
+            .from('participants')
+            .insert([participantData])
+            .select();
+
+        if (participantError) {
+            console.error('Error inserting participant:', participantError);
+            return;
+        }
+
+        if (participant && participant.length > 0) {
+            const participantId = participant[0].id;
+
+            const pollData = {
+                participant_id: participantId,
+                candidate: answers.party,
+                choice_reason: answers.choiceReason,
+                incumbent_rating: answers.incumbentRating,
+                priorities: answers.priorities,
+                info_source: answers.infoSource,
+                voter_status: answers.voterStatus,
+                age_range: answers.age,
+                profession: answers.profession,
+            };
+
+            const { error: pollError } = await supabase.from('poll_answers').insert([pollData]);
+
+            if (pollError) {
+                console.error('Error inserting poll answers:', pollError);
+            } else {
+                localStorage.setItem('hasVoted', 'true');
+                // Nettoyer les données sensibles après soumission
+                localStorage.removeItem('userBirthDate');
+                localStorage.removeItem('userLocation');
+                localStorage.removeItem('userLocationDetail');
+                navigate('/poll-results');
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (step === 9) {
+            submitPoll();
+        }
+    }, [step]);
+
     const handlePartySelect = (partyId) => {
         setAnswers({ ...answers, party: partyId });
         setTimeout(() => setStep(2), 300);
@@ -103,7 +161,11 @@ const PollPage = () => {
 
     const handleSingleSelect = (field, value) => {
         setAnswers({ ...answers, [field]: value });
-        setTimeout(() => setStep(step + 1), 300);
+        if (field === 'profession') {
+            setTimeout(() => setStep(9), 300);
+        } else {
+            setTimeout(() => setStep(step + 1), 300);
+        }
     };
 
     const handlePrioritySelect = (priorityId) => {
@@ -121,23 +183,6 @@ const PollPage = () => {
             return { ...prev, priorities: newPriorities };
         });
     };
-
-    // Mock Results Data
-    const results = [
-        { name: 'Bakary Ouattara', percent: 35, color: '#FF8200' },
-        { name: 'Tialy', percent: 30, color: '#009A44' },
-        { name: 'Kouadio K. Simon', percent: 15, color: '#607D8B' },
-        { name: 'Atchelo Faustin', percent: 10, color: '#78909C' },
-        { name: 'Traore H. Parfait', percent: 10, color: '#546E7A' },
-    ];
-
-    const priorityResults = [
-        { name: 'Emploi Jeunes', percent: 45, color: '#3498DB' },
-        { name: 'Santé', percent: 25, color: '#E74C3C' },
-        { name: 'Éducation', percent: 15, color: '#9B59B6' },
-        { name: 'Routes', percent: 10, color: '#F1C40F' },
-        { name: 'Sécurité', percent: 5, color: '#2ECC71' },
-    ];
 
     const totalSteps = 8; // Excluding intro and results
 
@@ -386,95 +431,6 @@ const PollPage = () => {
 
                 {/* STEP 8: PROFESSION */}
                 {step === 8 && renderSingleChoiceStep("Quelle est votre situation professionnelle ?", professions, 'profession')}
-
-
-                {/* STEP 9: RESULTS */}
-                {step === 9 && (
-                    <motion.div
-                        key="results"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                    >
-                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                            <div style={{
-                                width: '80px',
-                                height: '80px',
-                                background: '#E8F5E9',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                margin: '0 auto 1rem auto',
-                                color: 'var(--color-green)'
-                            }}>
-                                <Check size={40} />
-                            </div>
-                            <h2 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Merci d'avoir participé !</h2>
-                            <p style={{ color: 'var(--color-text-muted)' }}>Voici les tendances actuelles</p>
-                        </div>
-
-                        {/* Vote Results */}
-                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', marginBottom: '2rem' }}>
-                            <h3 style={{ fontWeight: 700, marginBottom: '1.5rem' }}>Intentions de vote</h3>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                                {results.map((r, index) => (
-                                    <div key={index}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>
-                                            <span>{r.name}</span>
-                                            <span>{r.percent}%</span>
-                                        </div>
-                                        <div style={{ width: '100%', height: '10px', background: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${r.percent}%` }}
-                                                transition={{ duration: 1, delay: 0.2 }}
-                                                style={{ height: '100%', background: r.color, borderRadius: '10px' }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Priority Results */}
-                        <div style={{ background: 'white', padding: '1.5rem', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-                            <h3 style={{ fontWeight: 700, marginBottom: '1.5rem' }}>Priorités de la localité</h3>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-                                {priorityResults.map((r, index) => (
-                                    <div key={index}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.9rem', fontWeight: 600 }}>
-                                            <span>{r.name}</span>
-                                            <span>{r.percent}%</span>
-                                        </div>
-                                        <div style={{ width: '100%', height: '10px', background: '#f0f0f0', borderRadius: '10px', overflow: 'hidden' }}>
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${r.percent}%` }}
-                                                transition={{ duration: 1, delay: 0.5 }}
-                                                style={{ height: '100%', background: r.color, borderRadius: '10px' }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-
-                        <button
-                            onClick={() => navigate('/home')}
-                            style={{
-                                marginTop: '2rem',
-                                background: 'transparent',
-                                color: 'var(--color-text-muted)',
-                                width: '100%',
-                                padding: '1rem',
-                                fontWeight: 600
-                            }}
-                        >
-                            Retour à l'accueil
-                        </button>
-                    </motion.div>
-                )}
 
             </AnimatePresence>
         </div>
